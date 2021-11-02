@@ -3,31 +3,31 @@ var app = express();
 var uuid = require('node-uuid');
 var logger = require('morgan');
 
-var pg = require('pg');
-var conString = process.env.DB; // "postgres://username:password@localhost/database";
+var connectionString = process.env.DB; // "postgres://username:password@localhost/database";
 
 app.use(logger('dev'));
 
 // Routes
 app.get('/api/status', function(req, res) {
-  pg.connect(conString, function(err, client, done) {
+
+  console.log(connectionString)
+  const { Pool } = require('pg');
+
+  const pool = new Pool({
+    connectionString,
+  })  
+
+  pool.query('SELECT now() as time', (err, result) => {
+    pool.end()
     if(err) {
-      return res.status(500).send('error fetching client from pool');
+      return res.status(500).send('Error running query');
     }
-    client.query('SELECT now() as time', [], function(err, result) {
-      //call `done()` to release the client back to the pool
-      done();
+    return res.json({
+      request_uuid: uuid.v4(),
+      time: result.rows[0].time
+    });    
+  })
 
-      if(err) {
-        return res.status(500).send('error running query');
-      }
-
-      return res.json({
-        request_uuid: uuid.v4(),
-        time: result.rows[0].time
-      });
-    });
-  });
 });
 
 // catch 404 and forward to error handler

@@ -1,0 +1,61 @@
+version: "3.3"
+   
+services:
+
+  dc-postgres:
+    container_name: dc-postgres
+    hostname: dc-postgres
+    image: postgres:${POSTGRES_VERSION}
+    volumes:
+      - vol-postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}      
+    networks:
+      - dc-net
+    ports:
+      - 5432:5432
+    restart:
+      always
+
+
+  dc-api:
+      container_name: dc-api
+      hostname: dc-api
+      build: 'api'      
+      volumes:
+        - vol-api:/usr/src/app
+      environment:
+        - PORT=${API_PORT}
+        - DB=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@dc-postgres:5432/${POSTGRES_DB}
+      depends_on:
+        - dc-postgres
+      networks:
+        - dc-net
+      ports:
+        - "${API_PORT}:${API_PORT}"
+
+  dc-web:
+      container_name: dc-web
+      build: 'web'      
+      volumes:
+        - vol-web:/usr/src/app
+      environment:
+        - PORT=${WEB_PORT}
+        - API_HOST=http://dc-api:${API_PORT}
+      depends_on:
+        - dc-api
+      networks:
+        - dc-net
+      ports:
+        - "${WEB_PORT}:${WEB_PORT}"
+
+volumes:
+  vol-postgres:
+  vol-api:
+  vol-web:
+
+networks: 
+  dc-net:
+    

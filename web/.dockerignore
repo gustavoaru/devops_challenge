@@ -1,0 +1,11 @@
+*/temp*
+*/*/temp*
+temp?
+*.md
+README-secret.md
+!README*.md
+node_modules
+npm-debug.log
+.gitignore
+.env
+Dockerfile

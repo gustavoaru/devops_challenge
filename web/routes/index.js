@@ -7,6 +7,8 @@ var api_url = process.env.API_HOST + '/api/status';
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  console.log("Rota default")
+  console.log(api_url)
   request(
     {
       method: 'GET',
