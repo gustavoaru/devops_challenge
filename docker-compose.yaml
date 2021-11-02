@@ -14,8 +14,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}      
     networks:
       - dc-net
-    ports:
-      - 5432:5432
+    expose:
+      - ${POSTGRES_PORT}
     restart:
       always
 
@@ -28,7 +28,7 @@ services:
         - vol-api:/usr/src/app
       environment:
         - PORT=${API_PORT}
-        - DB=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@dc-postgres:5432/${POSTGRES_DB}
+        - DB=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@dc-postgres:${POSTGRES_PORT}/${POSTGRES_DB}
       depends_on:
         - dc-postgres
       networks:
